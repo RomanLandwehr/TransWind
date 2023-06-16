@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 from tqdm import tqdm
 
+
 def Column(tree):
     New_Columns = []
     tree = ET.parse(tree)
@@ -17,7 +18,7 @@ def Column(tree):
 
 
 def ReadXML(tree):
-    Data = [[],[]]
+    Data = [[], []]
     tree = ET.parse(tree)
     root = tree.getroot()
     for child in root:
@@ -25,12 +26,13 @@ def ReadXML(tree):
         Text = []
         for subchild in child:
             tag = subchild.tag
-            text = subchild.text 
+            text = subchild.text
             Tag.append(tag)
             Text.append(text)
         Data[0].append(Tag)
         Data[1].append(Text)
     return Data
+
 
 def Dataframe(Data, Column):
     for dataset in range(len(Data[0])):
@@ -50,35 +52,36 @@ def Dataframe(Data, Column):
             Data_x.append("Fail")
         for y in range(len(D_D)):
             K = Key[y]
-            if K == 'Fail':
+            if K == "Fail":
                 K = y
             Data_x[K] = D_D[y]
         Data[0][dataset] = Column
         Data[1][dataset] = Data_x
     return Data
 
+
 ########################################
-Lokationen = 'Lokationen_'
-Columns = Column('Lokationen_1.xml')
-Data_Lokationen = [[],[]]
+Lokationen = "Lokationen_"
+Columns = Column("Lokationen_1.xml")
+Data_Lokationen = [[], []]
 for i in tqdm(range(50)):
     try:
-        x = Lokationen + str(i+1) + '.xml'
+        x = Lokationen + str(i + 1) + ".xml"
         Data = ReadXML(x)
         Data_Lokationen[0] += Data[0]
         Data_Lokationen[1] += Data[1]
     except FileNotFoundError:
-        break   
-Lokationen = Dataframe(Data_Lokationen,Columns)
+        break
+Lokationen = Dataframe(Data_Lokationen, Columns)
 ##########
 for i in range(len(Lokationen[1])):
     New = []
     x = []
     WE = Lokationen[1][i][4]
-    j = int(len(WE)/17)
+    j = int(len(WE) / 17)
     for k in range(j):
-        if len(WE) > 17*k:
-            x.append(WE[17*(k+1):15*(k+2)+2*k])
+        if len(WE) > 17 * k:
+            x.append(WE[17 * (k + 1) : 15 * (k + 2) + 2 * k])
     for l in range(len(x)):
         for l in range(6):
             New.append(Lokationen[1][i][l])
@@ -86,25 +89,25 @@ for i in range(len(Lokationen[1])):
         Lokationen[1].append(New)
 
 ########################################
-NAP = 'Netzanschlusspunkte_'
-Columns = Column('Netzanschlusspunkte_1.xml')
-Data_NAP = [[],[]]
+NAP = "Netzanschlusspunkte_"
+Columns = Column("Netzanschlusspunkte_1.xml")
+Data_NAP = [[], []]
 for i in tqdm(range(50)):
     try:
-        x = NAP + str(i+1) + '.xml'
+        x = NAP + str(i + 1) + ".xml"
         Data = ReadXML(x)
         Data_NAP[0] += Data[0]
         Data_NAP[1] += Data[1]
     except FileNotFoundError:
-        break 
-NAP = Dataframe(Data_NAP,Columns)
+        break
+NAP = Dataframe(Data_NAP, Columns)
 ########################################
-Columns = Column('EinheitenWind.xml')
-Data_Wind = [[],[]]
-Data = ReadXML('EinheitenWind.xml')
+Columns = Column("EinheitenWind.xml")
+Data_Wind = [[], []]
+Data = ReadXML("EinheitenWind.xml")
 Data_Wind[0] += Data[0]
 Data_Wind[1] += Data[1]
-Wind = Dataframe(Data_Wind,Columns)
+Wind = Dataframe(Data_Wind, Columns)
 ########################################
 
 for i in tqdm(range(len(Wind[1]))):
@@ -116,13 +119,15 @@ for i in tqdm(range(len(Wind[1]))):
             print(NAP)
             break
 
-NAP = 'SAN947309701293'
+NAP = "SAN947309701293"
 for i in range(len(Lokationen[1])):
     if Lokationen[1][i][5] == NAP:
         SEE = Lokationen[1][i][4]
         print(SEE)
-        
+
 for i in range(len(NAP)):
     if NAP[1][i][99] == NAP:
         NAP_P = NAP[1][i][99]
         print(NAP_P)
+
+# test
