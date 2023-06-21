@@ -7,13 +7,13 @@ step = 1000
 #####Lege die Leistung fest, bis zu der die NAPs betrachtet werden sollen
 maximum = 1000000
 
-#####Lese das Dataframe ein. Die Datei AuslastungNAPs.xlsx wir durch 
+#####Lies das Dataframe ein. Die Datei AuslastungNAPs.xlsx wir durch 
 #####Ausführung von main.py erstellt
 df = pd.read_excel('AuslastungNAPs.xlsx')
 df = df.set_index('MastrNummer')
 #####Lösche alle unvollständingen (Nettoengpassleistung = 0) NAPs
 df = df.drop(df[df['Nettoengpassleistung'] == 0].index)
-#####Betrachte nur NAps mit Auslastung > 1
+#####Betrachte nur NAPs mit Auslastung > 1
 df = df.drop(df[df['Auslastung'] <= 1].index)
 df = df[~df.index.duplicated(keep='first')]
 
