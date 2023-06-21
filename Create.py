@@ -21,6 +21,9 @@ def ReadXML(tree, Object):
                 ColumnB.append(text)
             if tag == Tag[2]:
                 ColumnC.append(text)
+            if tag == 'Netzanschlusskapazitaet':
+                print(text)
+                ColumnC.append(text)
         if len(ColumnA) > len(ColumnB):
             ColumnB.append('None')
         if len(ColumnA) > len(ColumnC):
@@ -38,6 +41,18 @@ def Create(Object):
         except FileNotFoundError:
             if Objectname == 'EinheitenWind.xml':
                 File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenBiomasse.xml':
+                File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenGasErzeuger.xml':
+                File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenGeothermieGrubengasDruckentspannung.xml':
+                File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenVerbrennung.xml':
+                File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenWasser.xml':
+                File = ReadXML(Objectname, Object)
+            if Objectname == 'EinheitenGasSpeicher.xml':
+                File = ReadXML(Objectname, Object)
             df_i = pd.DataFrame(File).transpose()
             df_i.columns = [Tag[0],Tag[1],Tag[2]]
             df_i = df_i.drop(df_i[df_i[Tag[1]].str.contains('None')].index)
@@ -52,8 +67,3 @@ def Create(Object):
         df_i = df_i.drop(df_i[df_i[Tag[1]].str.contains('None')].index)
         df = pd.concat([df, df_i], ignore_index=True)
     return df
-
-
-
-##### Speichere Werte
-#b = df.values.tolist()

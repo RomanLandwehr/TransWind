@@ -1,7 +1,7 @@
 import Object as O
 import Create as C
-import pickle
-from tqdm import tqdm
+import pickle   #Modul um Listen lokal als Dateien zu speicher -> Zeitersparnis
+from tqdm import tqdm     #Modul um den Fortschrittsbalken anzuzeigen
 
 def Setup():
     ##### Definitionen
@@ -80,17 +80,7 @@ try:
     StromSpeicher = pickle.load(open('EinheitenStromspeicher', 'rb'))
 except FileNotFoundError:
     Setup()
-    Lokationen = pickle.load(open('Lokationen', 'rb'))
-    NAP = pickle.load(open('Netzanschlusspunkte', 'rb'))
-    WEA = pickle.load(open('EinheitenWind', 'rb'))
-    Solar = pickle.load(open('EinheitenSolar', 'rb'))
-    Biomasse = pickle.load(open('EinheitenBiomasse', 'rb'))
-    GasErzeuger = pickle.load(open('EinheitenGasErzeuger', 'rb'))
-    Geothermie = pickle.load(open('EinheitenGeothermie', 'rb'))
-    Verbrennung = pickle.load(open('EinheitenVerbrennung', 'rb'))
-    Wasser = pickle.load(open('EinheitenWasser', 'rb'))
-    GasSpeicher = pickle.load(open('EinheitenGasSpeicher', 'rb'))
-    StromSpeicher = pickle.load(open('EinheitenStromspeicher', 'rb'))
+    print("Dateien erstellt. Skript erneut ausführen!")
     
 ##################################################
 WEA_Key = WEA['EinheitMastrNummer'].tolist()
@@ -114,8 +104,9 @@ Lokationen['Nettonennleistung'] = 0
 
 #####Erstelle Liste aller Erzeuger
 Sources = [WEA,Solar,Biomasse,Geothermie,Verbrennung,Wasser]
+Storages = [StromSpeicher] #Einträge GasSpeicher = 0, daher weggelassen
 
-#####Summere die Nettonennleistung der Erzeuger je Lokation (NAP)
+#####Summiere die Nettonennleistung der Erzeuger je Lokation (NAP)
 for source in Sources:
     for Anlage in tqdm(source['EinheitMastrNummer']):
         for Einheiten in Lokationen['VerknuepfteEinheitenMaStRNummern']:
@@ -125,7 +116,19 @@ for source in Sources:
                 j = Lokationen[Lokationen['VerknuepfteEinheitenMaStRNummern'] == Einheiten].index[0]
                 Lokationen.loc[Lokationen.index == j, 'Nettonennleistung'] += Leistung
                 break
-        
+            
+#####Summiere die Nettonennleistung der Speicher je Lokation (NAP)
+for storage in Storages:
+    for Anlage in tqdm(storage['EinheitMastrNummer']):
+        for Einheiten in Lokationen['VerknuepfteEinheitenMaStRNummern']:
+            if Anlage in Einheiten:
+                i = storage[storage['EinheitMastrNummer'] == Anlage].index[0]
+                Leistung = float(storage.loc[i]['Nettonennleistung'])
+                j = Lokationen[Lokationen['VerknuepfteEinheitenMaStRNummern'] == Einheiten].index[0]
+                Lokationen.loc[Lokationen.index == j, 'Nettonennleistung'] += Leistung
+                break
+
+#####Summiere die Nettoengpassleistung der NAPs je Lokation (NAP)
 for NAPs in tqdm(NAP['NetzanschlusspunktMastrNummer']):
     for Key in Lokationen['NetzanschlusspunkteMaStRNummern']:
         if NAPs in Key:
@@ -137,9 +140,11 @@ for NAPs in tqdm(NAP['NetzanschlusspunktMastrNummer']):
             j = Lokationen.index[Lokationen['NetzanschlusspunkteMaStRNummern'] == Key][0]
             Lokationen.loc[Lokationen.index == j, 'Nettoengpassleistung'] += Leistung
             break
-        
+
+##### Füge Spalte Auslastung hinzu        
 Lokationen['Auslastung'] = Lokationen['Nettonennleistung'] / Lokationen['Nettoengpassleistung']
 
+#####Speichere die Ergebnisse als Excel für Grafic.py
 Lokationen.to_excel('AuslastungNAPs.xlsx', index=False)
 
 

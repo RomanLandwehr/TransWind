@@ -9,7 +9,10 @@ maximum = 1000000
 
 #####Lies das Dataframe ein. Die Datei AuslastungNAPs.xlsx wir durch 
 #####Ausführung von main.py erstellt
-df = pd.read_excel('AuslastungNAPs.xlsx')
+try:
+    df = pd.read_excel('AuslastungNAPs.xlsx')
+except FileNotFoundError:
+    print("Fuehre main.py aus, um die Datei AuslastungNAPs.xlsx zu erstellen!")
 df = df.set_index('MastrNummer')
 #####Lösche alle unvollständingen (Nettoengpassleistung = 0) NAPs
 df = df.drop(df[df['Nettoengpassleistung'] == 0].index)
